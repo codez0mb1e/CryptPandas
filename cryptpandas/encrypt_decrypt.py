@@ -1,16 +1,14 @@
-"""
-Created on Tue Dec 22 00:11:29 2020
-@author: Luca Mingarelli
-"""
 import io, base64, os
 import pandas as pd
+
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptpandas.SALT import SALT
 
-def make_salt(__size=16):
+
+def make_salt(__size=16) -> bytes:
     """
     Makes a new salt.
 
@@ -21,7 +19,7 @@ def make_salt(__size=16):
     """
     return os.urandom(__size)
 
-def _get_key(password, salt=None):
+def _get_key(password, salt=None) -> bytes:
     """
     Generates secret key associated with provided password.
 
@@ -39,7 +37,7 @@ def _get_key(password, salt=None):
     return key
 
 
-def to_encrypted(df, password, path, salt=None):
+def to_encrypted(df, password, path, salt=None) -> None:
     """
     Writes pandas.DataFrame to password encrypted file.
 
@@ -60,7 +58,7 @@ def to_encrypted(df, password, path, salt=None):
         f.write(encrypted_df)
 
 
-def read_encrypted(path, password, salt=None):
+def read_encrypted(path, password, salt=None) -> pd.DataFrame:
     """
     Reads a previously encrypted file into a pandas.DataFrame.
 
