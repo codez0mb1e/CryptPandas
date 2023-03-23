@@ -1,20 +1,14 @@
-
-# %% 
 import os
-os.chdir("..")
-
-# %%
-AZURE_KEY_VAULT_NAME: str = "keymaker-akv"
-os.environ["AZURE_CLIENT_ID"] = "***"
-os.environ["AZURE_CLIENT_SECRET"] = "***"
-os.environ["AZURE_TENANT_ID"] = "***"
-
-# %%
 import pytest
 from cryptpandas.key_vaults import AzureKeyVaultManager, KeyVaultException
 
 
-# %%
+AZURE_KEY_VAULT_NAME: str = "cryptpandas-k"
+os.environ["AZURE_CLIENT_ID"] = "***"
+os.environ["AZURE_CLIENT_SECRET"] = "***"
+os.environ["AZURE_TENANT_ID"] = "***"
+
+
 def test_azure_key_vault_manager() -> None:
     kv_mngr = AzureKeyVaultManager(AZURE_KEY_VAULT_NAME)
     assert(
@@ -41,7 +35,7 @@ def test_get_key_as_byte(key: str) -> None:
     )
 
 
-@pytest.mark.parametrize("key", ["iamnotexists", "(:"])
+@pytest.mark.parametrize("key", ["iamnotexist", "iamnotexisttoo"])
 @pytest.mark.xfail(raises=KeyVaultException)
 def test_get_not_exist_key(key: str) -> None:
     kv_mngr = AzureKeyVaultManager(AZURE_KEY_VAULT_NAME)

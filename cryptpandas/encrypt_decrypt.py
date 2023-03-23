@@ -1,4 +1,5 @@
 import io, base64, os
+from typing import Optional
 import pandas as pd
 
 from cryptography.fernet import Fernet
@@ -20,7 +21,7 @@ def make_salt(__size: int = 16) -> bytes:
     return os.urandom(__size)
 
 
-def _get_key(password: str, salt: bytes = SALT) -> bytes:
+def _get_key(password: str, salt: Optional[bytes]) -> bytes:
     """
     Generates secret key associated with provided password.
 
@@ -32,7 +33,7 @@ def _get_key(password: str, salt: bytes = SALT) -> bytes:
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,
-        salt=salt,
+        salt=salt or SALT,
         iterations=100000,
         backend=default_backend(),
     )
@@ -40,7 +41,7 @@ def _get_key(password: str, salt: bytes = SALT) -> bytes:
     return key
 
 
-def to_encrypted(df: pd.DataFrame, password: str, path: str, salt: bytes) -> None:
+def to_encrypted(df: pd.DataFrame, password: str, path: str, salt: Optional[bytes] = None) -> None:
     """
     Writes pandas.DataFrame to password encrypted file.
 
@@ -61,7 +62,7 @@ def to_encrypted(df: pd.DataFrame, password: str, path: str, salt: bytes) -> Non
         f.write(encrypted_df)
 
 
-def read_encrypted(path: str, password: str, salt: bytes) -> pd.DataFrame:
+def read_encrypted(path: str, password: str, salt: Optional[bytes] = None) -> pd.DataFrame:
     """
     Reads a previously encrypted file into a pandas.DataFrame.
 
