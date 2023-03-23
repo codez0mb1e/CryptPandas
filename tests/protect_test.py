@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 from cryptpandas.key_vaults import AzureKeyVaultManager
-from cryptpandas.protect import DataframeProtector, DataframeProtectorSettings
+from cryptpandas.protect import DataframeProtector, ProtectorSettings
 
 
 # %% Set env
@@ -22,13 +22,15 @@ def test_e2e_protector():
          "Z": [True, False, True, False, True]
         })
 
-    settings = DataframeProtectorSettings("temp/encrypted.enc", "who-is-satoshi-nakamoto", "who-is-vitalik")
+    settings = ProtectorSettings("temp/encrypted.enc", "who-is-satoshi-nakamoto", "who-is-vitalik")
     protector = DataframeProtector(settings, AzureKeyVaultManager(AZURE_KEY_VAULT_NAME))
 
     # act
-    protector.encrypt(expected_df)
-    actual_df = protector.decrypt()
+    protector.protect(expected_df)
+    actual_df = protector.unprotect()
 
     # assert
-    assert isinstance(actual_df, pd.DataFrame)
-    assert (actual_df == expected_df).all().all()
+    assert(
+        isinstance(actual_df, pd.DataFrame) and
+        (actual_df == expected_df).all().all()
+    )

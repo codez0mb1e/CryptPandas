@@ -1,4 +1,3 @@
-# %%
 import os
 from abc import ABC, abstractmethod
 from typing import List, Union
@@ -6,7 +5,7 @@ from azure.identity import DefaultAzureCredential
 from azure.core.exceptions import ResourceNotFoundError
 from azure.keyvault.secrets import SecretClient
 
-# %%
+
 class BaseKeyVaultManager(ABC):
     """Key Vault manager abstraction"""
 

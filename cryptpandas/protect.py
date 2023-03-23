@@ -1,5 +1,3 @@
-
-# %% Set env
 from dataclasses import dataclass
 from typing import Tuple
 from pandas import DataFrame
@@ -9,14 +7,14 @@ from cryptpandas.encrypt_decrypt import to_encrypted, read_encrypted
 
 
 @dataclass
-class DataframeProtectorSettings:
+class ProtectorSettings:
     encrypted_file_path: str
     password_key: str
     salt_key: str
 
 
 class DataframeProtector:
-    def __init__(self, settings: DataframeProtectorSettings, key_vault_manager: BaseKeyVaultManager) -> None:
+    def __init__(self, settings: ProtectorSettings, key_vault_manager: BaseKeyVaultManager) -> None:
         self._settings = settings
         self._key_vault_manager = key_vault_manager
 
@@ -25,10 +23,10 @@ class DataframeProtector:
         salt = self._key_vault_manager.get_secret(self._settings.salt_key, as_bytes=True)
         return pwd, salt
 
-    def encrypt(self, df: DataFrame) -> None:
+    def protect(self, df: DataFrame) -> None:
         pwd, salt = self._get_secrets()
         to_encrypted(df, path=self._settings.encrypted_file_path, password=pwd, salt=salt)
 
-    def decrypt(self) -> DataFrame:
+    def unprotect(self) -> DataFrame:
         pwd, salt = self._get_secrets()
         return read_encrypted(path=self._settings.encrypted_file_path, password=pwd, salt=salt)
