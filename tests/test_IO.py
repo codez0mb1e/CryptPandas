@@ -30,5 +30,3 @@ def test_with_salt():
   crp.to_encrypted(df, password='mypassword123', path='file.crypt', salt=my_salt)
   decrypted_df = crp.read_encrypted(path='file.crypt', password='mypassword123', salt=my_salt)
   assert (df == decrypted_df).all().all()
-
-

@@ -1,16 +1,15 @@
-"""
-Created on Tue Dec 22 00:11:29 2020
-@author: Luca Mingarelli
-"""
 import io, base64, os
+from typing import Optional
 import pandas as pd
+
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptpandas.SALT import SALT
 
-def make_salt(__size=16):
+
+def make_salt(__size: int = 16) -> bytes:
     """
     Makes a new salt.
 
@@ -21,25 +20,28 @@ def make_salt(__size=16):
     """
     return os.urandom(__size)
 
-def _get_key(password, salt=None):
+
+def _get_key(password: str, salt: Optional[bytes]) -> bytes:
     """
     Generates secret key associated with provided password.
 
     Args:
         password (str): Your password or passphrase.
         salt:           The salt; if `None` (default) uses a default salt.
-        """
+    """
     enpassword = password.encode()
-    kdf = PBKDF2HMAC(algorithm=hashes.SHA256(),
-                     length=32,
-                     salt=salt or SALT,
-                     iterations=100000,
-                     backend=default_backend())
-    key = base64.urlsafe_b64encode(kdf.derive(enpassword))   # You can use kfd only once
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt or SALT,
+        iterations=100000,
+        backend=default_backend(),
+    )
+    key = base64.urlsafe_b64encode(kdf.derive(enpassword))  # You can use kfd only once
     return key
 
 
-def to_encrypted(df, password, path, salt=None):
+def to_encrypted(df: pd.DataFrame, password: str, path: str, salt: Optional[bytes] = None) -> None:
     """
     Writes pandas.DataFrame to password encrypted file.
 
@@ -56,11 +58,11 @@ def to_encrypted(df, password, path, salt=None):
     df.to_parquet(f)
     f.seek(0)
     encrypted_df = fernet.encrypt(f.read())
-    with open(path, 'wb') as f:
+    with open(path, "wb") as f:
         f.write(encrypted_df)
 
 
-def read_encrypted(path, password, salt=None):
+def read_encrypted(path: str, password: str, salt: Optional[bytes] = None) -> pd.DataFrame:
     """
     Reads a previously encrypted file into a pandas.DataFrame.
 
@@ -69,7 +71,7 @@ def read_encrypted(path, password, salt=None):
        password (str): Unique password used to encrypt the file.
        salt:           Salt for data encryption; if `None` (default) uses a default salt.
     """
-    with open(path, 'rb') as f:
+    with open(path, "rb") as f:
         encrypted_df = f.read()
     key = _get_key(password, salt=salt)
     fernet = Fernet(key)
