@@ -3,8 +3,9 @@
 from dataclasses import dataclass
 from typing import Tuple
 from pandas import DataFrame
+
 from cryptpandas.key_vaults import BaseKeyVaultManager
-import cryptpandas.encrypt_decrypt as enc_dec
+from cryptpandas.encrypt_decrypt import to_encrypted, read_encrypted
 
 
 @dataclass
@@ -26,8 +27,8 @@ class DataframeProtector:
 
     def encrypt(self, df: DataFrame) -> None:
         pwd, salt = self._get_secrets()
-        enc_dec.to_encrypted(df, path=self._settings.encrypted_file_path, password=pwd, salt=salt)
+        to_encrypted(df, path=self._settings.encrypted_file_path, password=pwd, salt=salt)
 
     def decrypt(self) -> DataFrame:
         pwd, salt = self._get_secrets()
-        return enc_dec.read_encrypted(path=self._settings.encrypted_file_path, password=pwd, salt=salt)
+        return read_encrypted(path=self._settings.encrypted_file_path, password=pwd, salt=salt)
